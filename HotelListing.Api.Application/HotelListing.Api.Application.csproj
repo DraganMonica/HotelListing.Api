@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Asp.Versioning.Mvc" Version="8.1.1" />
+		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.1" />
+		<PackageReference Include="AutoMapper" Version="16.1.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.9" />
+		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+		<PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.6" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="9.0.1" />
+	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HotelListing.Api.Common\HotelListing.Api.Common.csproj" />
+    <ProjectReference Include="..\HotelListing.Api.Domain\HotelListing.Api.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

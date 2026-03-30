@@ -1,29 +1,64 @@
+﻿###
 @HotelListing.Api_HostAddress = https://localhost:7022
+@apiKey=Kf9xP3LmQ7vZ2sA8dR6tYwU1nB4cHjX5
+@hotelId=10
+@bookingId=8
+@countryId=1
+@today={{$localDatetime iso8601}}
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0M2VlMjZkNC01ZjM0LTRmYWItODg4OS00NGIzNGE5MTkxNDAiLCJlbWFpbCI6ImFkbWluMkB0ZXN0LmNvbSIsImp0aSI6IjUxYmRiNTc2LWMyMGUtNDkzMy05ZDAzLTkxMWY5YWE2MWE2NCIsIm5hbWUiOiJBZG1pbjIsQWRtaW4yIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQWRtaW5pc3RyYXRvciIsImV4cCI6MTc3NDY0Njk3NywiaXNzIjoiSG90ZWxMaXN0aW5nQVBJIiwiYXVkIjoiSG90ZWxMaXN0aW5nQVBJQ2xlaW50In0.4ZOK9wEF_clGkKgZDXZREurWz2ydbMRwLdGxDkwSPGM
 
+
+### hoteladmin57
+POST {{HotelListing.Api_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "admin2@test.com",
+  "password": "Admin123!",
+  "firstName": "Admin2",
+  "lastName": "Admin2",
+  "role": "Administrator"
+  
+}
+### 
+POST {{HotelListing.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+{
+  "email": "admin2@test.com",
+  "password": "Admin123!"
+  
+}
+### 
+GET {{HotelListing.Api_HostAddress}}/api/apikey
+X-Api-Key:{{apikey}}
+
+### 
 
 GET {{HotelListing.Api_HostAddress}}/api/hotels
 
 ###
+# seeing the specific pageNumber
+GET {{HotelListing.Api_HostAddress}}/api/hotels?pageNumber=1&pageSize=10
 
+###
 POST {{HotelListing.Api_HostAddress}}/api/hotels
 Content-Type: application/json
 
 {
-  "Id": 4,
-  "name": "Hotel B",
-  "address": "456 Elm St",
-  "rating": 3.8
-
+  "name": "Grand Hotel Italiaaaaaaa",
+  "address": "Strada Trifoiului 2, Cluj-Napoca",
+  "rating": 4.6,
+  "countryId": 1
 }
 
 ###
 
-@id=0
-DELETE {{HotelListing.Api_HostAddress}}/api/hotels/{{id}}
 
+DELETE {{HotelListing.Api_HostAddress}}/api/hotels/10
+Authorization: Bearer  {{token}}
 ###
 
-GET {{HotelListing.Api_HostAddress}}/api/hotels/{{id}}
+GET {{HotelListing.Api_HostAddress}}/api/hotels/10
 
 ###
 
@@ -31,12 +66,113 @@ PUT {{HotelListing.Api_HostAddress}}/api/hotels/{{id}}
 Content-Type: application/json
 
 {
- 
-  "id": 0,
-  "name": " Testtttt Hotel B",
-  "address": "456 Elm St",
-  "rating": 3.8
-
+   
 }
 
+###
+
+GET {{HotelListing.Api_HostAddress}}/api/countries
+Authorization: Bearer  {{token}}
+###
+
+# get country hotels
+GET {{HotelListing.Api_HostAddress}}/api/countries/{{countryId}}/hotels?pageNumber=1&pageSize=10
+Authorization: Bearer  {{token}}
+###
+
+POST {{HotelListing.Api_HostAddress}}/api/countries
+Content-Type: application/json
+
+{
+   "name": "Hungary",
+  "shortName": "HU"
+}
+
+###
+@id=2
+DELETE {{HotelListing.Api_HostAddress}}/api/countries/{{id}}
+Authorization: Bearer  {{token}}
+
+###
+GET {{HotelListing.Api_HostAddress}}/api/countries/{{id}}
+Authorization: Bearer  {{token}}
+###
+
+PUT {{HotelListing.Api_HostAddress}}/api/countries/{{id}}
+Content-Type: application/json
+Authorization: Bearer  {{token}}
+
+{
+    "id": 2,
+    "name": "France",
+    "shortName": "FR"
+}
+###
+
+#1. CreateBookingDto- (3 nights)
+POST {{HotelListing.Api_HostAddress}}/api/hotels/{{hotelId}}/bookings
+Content-Type: application/json
+Authorization: Bearer  {{token}}
+{
+  "hotelId":{{hotelId}},
+  "checkIn":"2026-07-02",
+  "checkOut":"2026-07-13",
+  "guests":2
+}
+
+###
+
+
+#2. CreateBookingDto- diff hotel, single night stay
+POST {{HotelListing.Api_HostAddress}}/api/hotels/{{hotelId}}/bookings
+Content-Type: application/json
+Authorization: Bearer  {{token}}
+{
+  "hotelId":{{hotelId}},
+  "checkIn":"2026-10-10",
+  "checkOut":"2026-10-15",
+  "guests":2
+}
+
+###
+#3.UpdateBookingDto- extend stay
+PUT {{HotelListing.Api_HostAddress}}/api/hotels/{{hotelId}}/bookings/{{bookingId}}
+Content-Type: application/json
+Authorization: Bearer  {{token}}
+{
+  
+  "checkIn":"2026-10-10",
+  "checkOut":"2026-10-17",
+  "guests":2
+}
+
+###
+
+GET {{HotelListing.Api_HostAddress}}/api/hotels/{{hotelId}}/bookings
+Content-Type: application/json
+Authorization: Bearer  {{token}}
+###
+
+PUT {{HotelListing.Api_HostAddress}}/api/hotels/{{hotelId}}/bookings/{{bookingId}}/admin/confirm
+Authorization: Bearer  {{token}}
+###
+
+PUT {{HotelListing.Api_HostAddress}}/api/hotels/{{hotelId}}/bookings/{{bookingId}}/admin/cancel
+Authorization: Bearer  {{token}}
+###
+# list all bookings for admin
+GET {{HotelListing.Api_HostAddress}}/api/hotels/{{hotelId}}/bookings/admin
+Authorization: Bearer  {{token}}
+###
+
+GET {{HotelListing.Api_HostAddress}}/api/countries/1/hotels?pageNumber=2&pageSize=20 &minRating=4.1
+###
+
+
+GET {{HotelListing.Api_HostAddress}}/api/countries/{{countryId}}/hotels
+Authorization: Bearer  {{token}}
+###
+
+GET {{HotelListing.Api_HostAddress}}/api/countries/{{countryId}}/hotels?search=car
+Authorization: Bearer  {{token}}
 ###

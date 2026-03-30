@@ -1,75 +1,75 @@
-﻿using HotelListing.Api.Data;
+﻿using HotelListing.Api.Application.Contracts;
+using HotelListing.Api.Application.DTOs.Hotel;
+using HotelListing.Api.Common.Models.Filtering;
+using HotelListing.Api.Common.Models.Paging;
+using HotelListing.Api.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HotelListing.Api.Controllers;
 
-[Route("api/[controller]")]
-[ApiController]
-public class HotelsController : ControllerBase
+
+namespace HotelListing.Api.Controllers
 {
-    private static List<Hotel> hotels = new List<Hotel>
+    [Route("api/[controller]")]
+    [ApiController]
+    public class HotelsController(IHotelsService hotelsService) : BaseApiController
     {
-        new Hotel { Id = 1, Name = "Hotel A", Address = "123 Main St", Rating = 4.5 },
-        new Hotel { Id = 2, Name = "Hotel B", Address = "456 Elm St", Rating = 3.8 },
-        new Hotel { Id = 3, Name = "Hotel C", Address = "789 Oak St", Rating = 4.2 }
-    };
-    // GET: api/<HotelsController>
-    [HttpGet]
-    public ActionResult<IEnumerable<Hotel>> Get()
-    {
-        return Ok(hotels);
-    }
 
-    // GET api/<HotelsController>/5
-    [HttpGet("{id}")]
-    public ActionResult<Hotel> Get(int id)
-    {
-        var hotel=hotels.FirstOrDefault(h => h.Id == id);
-        if(hotel == null)
+        // GET: api/Hotels
+        [HttpGet]
+        public async Task<ActionResult<PageResult<GetHotelDto>>> GetHotels([FromQuery] PaginationParameters paginationParameters, [FromQuery] HotelFilterParameters filters)
         {
-            return NotFound();
+            var result = await hotelsService.GetHotelsAsync(paginationParameters, filters);
+            return ToActionResult(result);
         }
-        return Ok(hotel);
-    }
 
-    // POST api/<HotelsController>
-    [HttpPost]
-    public ActionResult<Hotel> Post([FromBody] Hotel newHotel)
-    {
-        if(hotels.Any(h => h.Id == newHotel.Id))
+        // GET: api/Hotels/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<GetHotelDto>> GetHotel(int id)
         {
-            return BadRequest("Hotel with the same Id already exists.");
+            //
+            var result = await hotelsService.GetHotelAsync(id);
+            return ToActionResult(result);
         }
-        hotels.Add(newHotel);
-        return CreatedAtAction(nameof(Get), new { id = newHotel.Id }, newHotel);
-    }
 
-    // PUT api/<HotelsController>/5
-    [HttpPut("{id}")]
-    public ActionResult Put(int id, [FromBody] Hotel updatedHotel)
-    {
-        var existingHotel=hotels.FirstOrDefault(h => h.Id == id);
-        if (existingHotel == null)
+        // PUT: api/Hotels/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        [Authorize(Roles ="Administrator")]
+        public async Task<IActionResult> PutHotel(int id, UpdateHotelDto hotelDto)
         {
-            return NotFound();
+            var result = await hotelsService.UpdateHotelAsync(id, hotelDto);
+            return ToActionResult(result);
         }
-        existingHotel.Name = updatedHotel.Name;
-        existingHotel.Address = updatedHotel.Address;
-        existingHotel.Rating = updatedHotel.Rating;
 
-        return NoContent();
-    }
-
-    // DELETE api/<HotelsController>/5
-    [HttpDelete("{id}")]
-    public ActionResult Delete(int id)
-    {
-        var hotel = hotels.FirstOrDefault(h => h.Id == id);
-        if (hotel == null)
+        // POST: api/Hotels
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult<Hotel>> PostHotel(CreateHotelDto hotelDto)
         {
-            return NotFound(new {message="Hotel not found"});
+            var result = await hotelsService.CreateHotelAsync(hotelDto);
+            if (!result.IsSuccess)
+                return MapErrorsToResponse(result.Errors);
+
+            return CreatedAtAction(
+                nameof(GetHotel), new { id = result.Value!.Id }, result.Value
+            );
         }
-        hotels.Remove(hotel);
-        return NoContent();
+
+        // DELETE: api/Hotels/5
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> DeleteHotel(int id)
+        {
+            //delete hotel
+            var result = await hotelsService.DeleteHotelAsync(id);
+            return ToActionResult(result);
+        }
+
+        
+
+
+
     }
 }
